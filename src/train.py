@@ -77,7 +77,7 @@ def train(model, model_save_path, train_dataset, val_dataset, batch_size, lr, ep
         if total_acc_val / len(val_dataset) > best_acc_val / len(val_dataset):
             best_acc_val = total_acc_val / len(val_dataset)
             torch.save(model.state_dict(), model_save_path)
-            print(f'''best model | Val Accuracy: {best_acc_val / len(val_dataset): .3f}''')
+            print(f'''best model | Val Accuracy: {best_acc_val: .3f}''')
         print(
             f'''Epochs: {epoch + 1} 
               | Train Loss: {total_loss_train / len(train_dataset): .3f} 
