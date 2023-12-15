@@ -270,7 +270,7 @@ def test(model, model_save_path, test_dataset, batch_size):
         for test_input, test_label in test_dataloader:
             test_label = test_label.to(device)
             attention_mask = test_input['attention_mask'].to(device)
-            input_ids = test_input['input_ids'].to(device)
+            input_ids = test_input['input_ids'].squeeze(1).to(device)
             output = model(input_ids, attention_mask)
             acc = (output.argmax(dim=1) == test_label).sum().item()
             total_acc_test += acc
