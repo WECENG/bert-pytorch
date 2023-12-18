@@ -31,12 +31,12 @@ def train(model, model_save_path, train_dataset, val_dataset, batch_size, lr, ep
         model = model.to(device)
         criterion = criterion.to(device)
 
-    best_acc_val = 0
-    model.train()
+    best_avg_acc_val = 0
     for epoch in range(epochs):
         # 训练集损失&准确率
         total_loss_train = 0
         total_acc_train = 0
+        model.train()
         # 训练进度
         for train_input, train_label in tqdm(train_loader):
             train_label = train_label.to(device)
@@ -74,10 +74,10 @@ def train(model, model_save_path, train_dataset, val_dataset, batch_size, lr, ep
                 total_acc_val += acc
 
         # save model
-        if total_acc_val / len(val_dataset) > best_acc_val / len(val_dataset):
-            best_acc_val = total_acc_val / len(val_dataset)
+        if (total_acc_val / len(val_dataset)) > best_avg_acc_val:
+            best_avg_acc_val = total_acc_val / len(val_dataset)
             torch.save(model.state_dict(), model_save_path)
-            print(f'''best model | Val Accuracy: {best_acc_val: .3f}''')
+            print(f'''best model | Val Accuracy: {best_avg_acc_val: .3f}''')
         print(
             f'''Epochs: {epoch + 1} 
               | Train Loss: {total_loss_train / len(train_dataset): .3f} 
@@ -111,7 +111,7 @@ def test(model, model_save_path, test_dataset, batch_size):
 
 if __name__ == '__main__':
     batch_size = 24
-    learn_rate = 1e-4
+    learn_rate = 1e-5
     epochs = 5
     # 加载数据
     label_datas = pd.read_excel('../train-datas/ChnSentiCorp_htl_all.xlsx')

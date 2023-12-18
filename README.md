@@ -132,13 +132,13 @@ def train(model, model_save_path, train_dataset, val_dataset, batch_size, lr, ep
         criterion = criterion.to(device)
 
     print('train begin')
-    model.train()
     for epoch in range(epochs):
         # 训练集损失&准确率
         total_loss_train = 0
         total_acc_train = 0
         # 训练进度
         for train_input, train_label in tqdm(train_loader):
+          	model.train()
             train_label = train_label.to(device)
             attention_mask = train_input['attention_mask'].to(device)
             input_ids = train_input['input_ids'].squeeze(1).to(device)
@@ -277,3 +277,37 @@ def test(model, model_save_path, test_dataset, batch_size):
     print(f'Test Accuracy: {total_acc_test / len(test_dataset): .3f}')
 ```
 
+
+
+## Q&A
+
+- **Q **：训练停滞（训练无法持续优化模型）
+  **A**：问题可能出在数据加载、模型初始化、学习率、过拟合、训练过程中的验证等方面。以下是一些建议：
+
+  1. **数据加载**：确保数据加载正确，并且在训练过程中确实抽取了不同的批次。你可以打印一些关于批次的信息来验证这一点。
+  2. **随机初始化**：检查模型中是否存在随机初始化的元素，特别是如果某些层或参数是随机初始化的。如果这些在每个epoch开始时没有得到正确的重新初始化，模型可能无法有效学习。
+  3. **学习率**：学习率（`lr`参数）可能过高，导致模型迅速收敛到次优解。尝试减小学习率，看看是否有帮助。
+  4. **过拟合**：如果模型与数据集的规模相比过于复杂，可能会迅速发生过拟合。尝试降低模型复杂性或增加数据集的规模。
+  5. **训练期间的验证**：检查训练期间的模型验证（验证准确性）是否按预期工作。如果验证准确性没有变化，可能表示验证数据集或评估过程中存在问题。
+  6. **打印语句**：在训练循环中添加打印语句，以打印损失、准确性和其他相关信息的值。这有助于确定问题发生在何处。
+     解决方案：调低lr
+
+- **Q**：BERT的输出是什么
+
+- **A**：在使用预训练的 Transformer 模型（比如BERT）进行自然语言处理任务时，模型的隐藏状态和池化是两个重要的概念。
+
+  1. 隐藏状态（Hidden States）：
+
+     每个输入标记（token）在 Transformer 模型中经过多个层的处理，每一层都会生成一个隐藏状态。这些隐藏状态包含了关于输入标记的丰富信息，可以理解为对输入的编码表示。在BERT等模型中，最后一层的隐藏状态通常被用于下游任务，如文本分类、命名实体识别等。
+
+     在代码片段中，`last_hidden_state` 就是指最后一层的隐藏状态。它是一个张量，形状为`batch_size,sequence_length,hidden_size`，其中 `batch_size` 是输入的样本数，`sequence_length` 是输入序列的长度，`hidden_size` 是隐藏状态的维度。
+
+  2. 池化（Pooling）：
+
+     在某些任务中，我们可能对整个输入序列的表示只关心一个汇总的信息，而不是每个标记的详细信息。这时就会使用池化操作，将整个序列的信息进行压缩。
+
+     在BERT中，通常使用的是池化操作得到的 `pooled_output`。这个操作通常是对整个序列的隐藏状态进行池化，生成一个长度固定的向量，代表整个序列的信息。在文本分类任务中，这个向量可以被用作输入序列的表示，供分类器进行分类。
+
+     
+
+  
